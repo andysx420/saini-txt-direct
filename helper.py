@@ -2,11 +2,13 @@ import os
 import re
 import time
 import mmap
+import json
 import datetime
 import aiohttp
 import aiofiles
 import asyncio
 import logging
+import mimetypes
 import requests
 import tgcrypto
 import subprocess
@@ -16,7 +18,7 @@ from utils import progress_bar
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from io import BytesIO
-from pathlib import Path  
+from pathlib import Path 
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from base64 import b64decode
@@ -28,6 +30,28 @@ def duration(filename):
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
     return float(result.stdout)
+
+
+def resolution(filename):
+    mime_type, _ = mimetypes.guess_type(filename)
+    if not mime_type or not mime_type.startswith("video"):
+        return None, None  # Not a video file
+
+    result = subprocess.run([
+        "ffprobe", "-v", "error", "-select_streams", "v:0",
+        "-show_entries", "stream=width,height",
+        "-of", "default=noprint_wrappers=1:nokey=1", filename
+    ],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT)
+
+    try:
+        output = result.stdout.decode().split()
+        width = int(output[0])
+        height = int(output[1])
+        return width, height
+    except Exception:
+        return None, None  # Return nothing if error occurs
 
 def get_mps_and_keys(api_url):
     response = requests.get(api_url)
@@ -293,27 +317,68 @@ async def download_and_decrypt_video(url, cmd, name, key):
             return None  
 
 async def send_vid(bot: Client, m: Message, cc, filename, thumb, name, prog, channel_id):
+    # Generate thumbnail using ffmpeg
     subprocess.run(f'ffmpeg -i "{filename}" -ss 00:00:10 -vframes 1 "{filename}.jpg"', shell=True)
+
+    # Get original resolution and choose closest fit
+    width, height = resolution(filename)
+    if width and height:
+        if height <= 360:
+            width, height = 640, 360
+        elif height <= 480:
+            width, height = 854, 480
+        elif height <= 720:
+            width, height = 1280, 720
+        else:
+            width, height = 1920, 1080
+    else:
+        width, height = None, None  # Let Telegram handle non-video types
+    
     await prog.delete (True)
-    reply1 = await bot.send_message(channel_id, f"**📩 Uploading Video 📩:-**\n<blockquote>**{name}**</blockquote>")
-    reply = await m.reply_text(f"**Generate Thumbnail:**\n<blockquote>**{name}**</blockquote>")
+
+    # Notify start of upload
+    notify_upload = await bot.send_message(channel_id, f"**📩 Uploading Video 📩:**\n<blockquote>**{name}**</blockquote>")
+    notify_thumb = await m.reply_text(f"**🖼️ Generating Thumbnail:**\n<blockquote>**{name}**</blockquote>")
+
     try:
         if thumb == "/d":
             thumbnail = f"{filename}.jpg"
         else:
             thumbnail = thumb
-            
     except Exception as e:
         await m.reply_text(str(e))
-      
+        thumbnail = None
+
+    # Get duration of video
     dur = int(duration(filename))
     start_time = time.time()
 
+    # Try sending video
     try:
-        await bot.send_video(channel_id, filename, caption=cc, supports_streaming=True, height=720, width=1280, thumb=thumbnail, duration=dur, progress=progress_bar, progress_args=(reply, start_time))
-    except Exception:
-        await bot.send_document(channel_id, filename, caption=cc, progress=progress_bar, progress_args=(reply, start_time))
+        await bot.send_video(
+            channel_id, 
+            filename, 
+            caption=cc, 
+            supports_streaming=True, 
+            height=height, 
+            width=width, 
+            thumb=thumbnail, 
+            duration=dur, 
+            progress=progress_bar, 
+            progress_args=(notify_thumb, start_time)
+        )
+    except Exception as e:
+        await bot.send_document(
+            channel_id, 
+            filename, 
+            caption=cc, 
+            progress=progress_bar, 
+            progress_args=(notify_thumb, start_time)
+        )
+
+    # Clean up
+    await notify_thumb.delete(True)
+    await notify_upload.delete(True)
     os.remove(filename)
-    await reply.delete(True)
-    await reply1.delete(True)
-    os.remove(f"{filename}.jpg")
+    if os.path.exists(f"{filename}.jpg"):
+        os.remove(f"{filename}.jpg")
