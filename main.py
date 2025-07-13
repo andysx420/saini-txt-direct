@@ -506,7 +506,7 @@ async def id_command(client, message: Message):
            f"• 🎓 Utkarsh Protection(Video + PDF)\n"
            f"• 🎓 All Non DRM+AES Encrypted URLs\n"
            f"• 🎓 MPD URLs if the key is known (e.g., Mpd_url?key=key XX:XX)</blockquote>\n\n"
-           f"<b>💵 Monthly Plan: free</b>\n\n"
+           f"<b>💵 Monthly Plan: 500</b>\n\n"
            f"If you want to buy membership of the bot, feel free to contact the Bot Admin.\n", disable_web_page_preview=True, reply_markup=BUTTONSCONTACT
     )  
 
@@ -864,12 +864,12 @@ async def txt_handler(bot: Client, m: Message):
                 cmd = f'yt-dlp -f "{ytf}" "{url}" -o "{name}.mp4"'
 
             try:
-                cc = f'[🎥]Vid Id : {str(count).zfill(3)}\n**Video Title :** `{name1} [{res}p].mkv`\n<blockquote><b>Batch Name :</b> {b_name}</blockquote>\n\n**Extracted by➤**{CR}\n'
-                cc1 = f'[📕]Pdf Id : {str(count).zfill(3)}\n**File Title :** `{name1}.pdf`\n<blockquote><b>Batch Name :</b> {b_name}</blockquote>\n\n**Extracted by➤**{CR}\n'
-                cczip = f'[📁]Zip Id : {str(count).zfill(3)}\n**Zip Title :** `{name1}.zip`\n<blockquote><b>Batch Name :</b> {b_name}</blockquote>\n\n**Extracted by➤**{CR}\n' 
-                ccimg = f'[🖼️]Img Id : {str(count).zfill(3)}\n**Img Title :** `{name1}.jpg`\n<blockquote><b>Batch Name :</b> {b_name}</blockquote>\n\n**Extracted by➤**{CR}\n'
-                ccm = f'[🎵]Audio Id : {str(count).zfill(3)}\n**Audio Title :** `{name1}.mp3`\n<blockquote><b>Batch Name :</b> {b_name}</blockquote>\n\n**Extracted by➤**{CR}\n'
-                cchtml = f'[🌐]Html Id : {str(count).zfill(3)}\n**Html Title :** `{name1}.html`\n<blockquote><b>Batch Name :</b> {b_name}</blockquote>\n\n**Extracted by➤**{CR}\n'
+                cc = f'[🎥]Vid Id : {str(count).zfill(3)}\n**🎬 Title :** `{name1} [{res}p]`\n\n<blockquote><b>📦 Batch Name :</b> {b_name}</blockquote>\n\n**🛠️ Extracted by ➤ **{CR}\n'
+                cc1 = f'[📕]Pdf Id : {str(count).zfill(3)}\n**📄 File Title :** `{name1}`\n\n<blockquote><b>📦 Batch Name :</b> {b_name}</blockquote>\n\n**🛠️ Extracted by ➤ **{CR}\n'
+                cczip = f'[📁]Zip Id : {str(count).zfill(3)}\n**🗜️ Zip Title :** `{name1}.zip`\n\n<blockquote><b>📦 Batch Name :</b> {b_name}</blockquote>\n\n**🛠️ Extracted by ➤ **{CR}\n' 
+                ccimg = f'[🖼️]Img Id : {str(count).zfill(3)}\n**🖋️ Img Title :** `{name1}.jpg`\n\n<blockquote><b>📦 Batch Name :</b> {b_name}</blockquote>\n\n**🛠️ Extracted by ➤ **{CR}\n'
+                ccm = f'[🎵]Audio Id : {str(count).zfill(3)}\n**🎧 Audio Title :** `{name1}.mp3`\n\n<blockquote><b>📦 Batch Name :</b> {b_name}</blockquote>\n\n**🛠️ Extracted by ➤ **{CR}\n'
+                cchtml = f'[🌐]Html Id : {str(count).zfill(3)}\n**📜 Html Title :** `{name1}.html`\n\n<blockquote><b>📦 Batch Name :</b> {b_name}</blockquote>\n\n**🛠️ Extracted by ➤ **{CR}\n'
                   
                 if "drive" in url:
                     try:

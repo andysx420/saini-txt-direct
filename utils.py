@@ -99,7 +99,7 @@ async def progress_bar(current, total, reply, start):
 
             try:  
                 await reply.edit(
-                    f'<blockquote>`╭──⌯═════𝐁𝐨𝐭 𝐒𝐭𝐚𝐭𝐢𝐜𝐬══════⌯──╮\n'
+                    f'<blockquote>`╭──⌯═════ BOT STATUS ═════⌯──╮\n'
                     f'├⚡ {progress_bar}\n'
                     f'├⚙️ Progress ➤ | {perc} |\n'
                     f'├🚀 Speed ➤ | {sp} |\n'
